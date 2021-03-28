@@ -1,0 +1,11 @@
+{
+	"authors": [
+		"LeinneSW"
+	],
+	"dependencies": {
+		"dwt": "~>1.0.5+swt-3.4.1"
+	},
+	"description": "A simple vibe.d server application.",
+	"license": "proprietary",
+	"name": "yut"
+}
