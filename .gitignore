@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/yut
+yut.so
+yut.dylib
+yut.dll
+yut.a
+yut.lib
+yut-test-*
+*.exe
+*.o
+*.obj
+*.lst
