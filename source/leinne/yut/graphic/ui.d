@@ -1,10 +1,12 @@
 module leinne.yut.graphic.ui;
 
 import std.stdio;
-import leinne.yut.system.yut;
+import leinne.yut.game.yut;
 import org.eclipse.swt.all;
 
 class GameUI{
+
+    private static GameUI instance = null;
 
     private Display display;
     private Shell shell;
@@ -14,13 +16,26 @@ class GameUI{
 
     this(){
         display = new Display;
-        shell = new Shell(display);
+        shell = new Shell(display, SWT.CLOSE | SWT.TITLE | SWT.MIN);
         shell.setLayout(makeGridLayout());
+    }
+
+    public static GameUI getInstance(){
+        if(instance is null){
+            instance = new GameUI();
+        }
+        return instance;
     }
 
     private auto makeGridLayout(){
         auto layout = new GridLayout;
         layout.marginWidth = layout.marginHeight = layout.verticalSpacing = layout.horizontalSpacing = 0;
+        return layout;
+    }
+
+    private auto makeRowLayout(){
+        auto layout = new RowLayout;
+        layout.marginLeft = layout.marginRight = layout.marginTop = layout.marginBottom = layout.spacing = 0;
         return layout;
     }
 
@@ -48,7 +63,7 @@ class GameUI{
             public void handleEvent(Event e){
                 auto names = [nick1.getText(), nick2.getText()];
                 foreach(control; shell.getChildren) control.dispose();
-                ui.makeYutnoriBoard(names[0], names[1]);
+                ui.showYutGame(names[0], names[1]);
             }
         });
 
@@ -56,11 +71,9 @@ class GameUI{
         shell.open();
     }
 
-    public void makeYutnoriBoard(string nickname, string nickname2){
+    public void showYutGame(string nickname, string nickname2){
         shell.setText("윷놀이");
-        auto layout = new RowLayout;
-        layout.marginLeft = layout.marginRight = layout.marginTop = layout.marginBottom = layout.spacing = 0;
-        shell.setLayout(layout);
+        shell.setLayout(makeRowLayout());
 
         yutBoard = new Composite(shell, SWT.NONE);
         yutBoard.setLayout(makeGridLayout());
@@ -76,26 +89,30 @@ class GameUI{
 
     private void makeYutGameBoard(){
         //윷놀이 게임보드
-        auto yutBoard = new Canvas(this.yutBoard, SWT.NONE);
-        yutBoard.addPaintListener(new class PaintListener{
-            public void paintControl(PaintEvent e) {
-                auto image = new Image(display, "resources/YutGameBoard.png");
-                e.gc.drawImage(image, 0, 0);
-                image.dispose();
+        auto gameBoard = new Composite(yutBoard, SWT.NONE);
+        gameBoard.setBackgroundImage(new Image(display, "resources/YutGameBoard.png"));
+        gameBoard.addDisposeListener(new class DisposeListener{
+            public void widgetDisposed(DisposeEvent e){
+                gameBoard.getBackgroundImage().dispose();
             }
         });
-        yutBoard.setLayoutData(new GridData(600, 600));
+        gameBoard.setLayoutData(new GridData(600, 600));
     }
 
     public void makeYutResultAndThrowButton(){
         auto comp = new Composite(yutBoard, SWT.NONE);
-        comp.setLayout(shell.getLayout);
+        comp.setLayout(makeRowLayout());
         comp.setLayoutData(new GridData(600, 100));
 
         //윷 결과창
-        auto label = new Label(comp, SWT.WRAP);
-        label.setText("");
-        label.setLayoutData(new RowData(400, 100));
+        auto yutResult = new Composite(comp, SWT.NONE);
+        yutResult.setBackgroundImage(new Image(display, "resources/YutResultBoard.png"));
+        yutResult.setLayoutData(new RowData(400, 150));
+        yutResult.addDisposeListener(new class DisposeListener{
+            public void widgetDisposed(DisposeEvent e){
+                yutResult.getBackgroundImage().dispose();
+            }
+        });
 
         //윷 던지기 버튼
         auto button = new Canvas(comp, SWT.NONE);
@@ -107,9 +124,9 @@ class GameUI{
                 image.dispose();
             }
         });
-        button.addListener(SWT.MouseDown, new class Listener{
+        button.addListener(SWT.MouseUp, new class Listener{
             public void handleEvent(Event e){
-                label.setText((label.getText == "" ? "" : label.getText ~ ", ") ~ YutBase.convertKorean(YutBase.result()));
+                //label.setText((label.getText == "" ? "" : label.getText ~ ", ") ~ Yut.convertKorean(Yut.result()));
             }
         });
         button.setCursor(new Cursor(display, SWT.CURSOR_HAND));

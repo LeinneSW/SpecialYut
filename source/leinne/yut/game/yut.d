@@ -1,8 +1,9 @@
-module leinne.yut.system.yut;
+module leinne.yut.game.yut;
 
 import std.random;
+import leinne.yut.graphic.ui;
 
-class YutBase{
+class Yut{
 
     public static const FRONT = 0;
     public static const BACK = 1;
@@ -51,6 +52,25 @@ class YutBase{
     }
 }
 
+/**
+  * 구현해야할 것
+  * 턴제
+  * 턴 남은시간 타이머
+  *
+  *
+  */
 class YutGame{
+
+    private static YutGame instance = null;
+
+    this(){
+    }
+
+    public static YutGame getInstance(){
+        if(instance is null){
+            instance = new YutGame();
+        }
+        return instance;
+    }
 
 }
